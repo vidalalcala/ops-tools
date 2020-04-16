@@ -6,6 +6,7 @@ install:
   - brew update
   - brew unlink python@2
   - brew upgrade python
+  - brew link --overwrite python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
 
