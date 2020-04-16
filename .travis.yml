@@ -1,0 +1,16 @@
+compiler:
+  - g++-5
+
+install:
+  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+  - brew tap liamg/tfsec
+  - brew install liamg/tfsec/tfsec
+
+before_script:
+  - tfsec .
+
+script:
+  - pip install -r requirements.txt
+
+os:
+  - osx

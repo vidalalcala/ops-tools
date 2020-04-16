@@ -1,0 +1,4 @@
+- name: install virtualenv
+  hosts: localhost
+  roles:
+    - virtualenv
