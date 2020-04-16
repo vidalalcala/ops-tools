@@ -12,7 +12,7 @@ install:
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
 
-  before_script:
+before_script:
   - tfsec .
 
 script:
