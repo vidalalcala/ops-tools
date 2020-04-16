@@ -5,6 +5,7 @@ install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - brew update
   - brew upgrade
+  - brew link --overwrite python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
 
