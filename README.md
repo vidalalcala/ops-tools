@@ -1,2 +1,2 @@
 # ops-tools
-Operations tools
+Operations tools for infrastructure
