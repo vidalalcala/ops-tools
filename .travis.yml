@@ -6,7 +6,7 @@ osx_image:
 
 install:
   - brew update
-  - brwe doctor
+  - brew doctor
   - brew cleanup
   - brew upgrade openssl
   - brew upgrade python
