@@ -6,21 +6,13 @@ osx_image:
 
 install:
   - export PATH="/usr/local/opt/python/libexec/bin:$PATH"
-  - python --version
-  - which -a python
   - brew update
-  - brew install python@3.8 xz
   - brew cleanup
   - brew upgrade python
-  - brew link python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
-  - echo $PATH
-  - python --version
-  - which -a python
-  - pip --version
-  - pip install 'requests[security]'
   - pip install -r requirements.txt
+  - pip install pytest
 
 before_script:
   - tfsec .
