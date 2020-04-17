@@ -10,7 +10,7 @@ compiler:
 install:
   - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - brew update
-  - brew uprade openssl
+  - brew upgrade openssl
   - brew upgrade python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
