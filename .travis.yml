@@ -5,13 +5,14 @@ osx_image:
   - xcode9.2
 
 install:
-  - echo $PATH
+  - export PATH="/usr/local/opt/python/libexec/bin:$PATH"
   - python --version
   - which -a python
   - brew update
   - brew install python@3.8 xz
   - brew cleanup
   - brew upgrade python
+  - brew link python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
   - echo $PATH
