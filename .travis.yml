@@ -12,10 +12,6 @@ install:
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
   - pip install -r requirements.txt
-  - pip install pytest
-
-before_script:
-  - tfsec .
 
 script:
-  - pytest
+  - tfsec .
