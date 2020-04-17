@@ -5,12 +5,18 @@ osx_image:
   - xcode9.2
 
 install:
+  - echo $PATH
+  - python --version
+  - which -a python
   - brew update
   - brew install python@3.8 xz
   - brew cleanup
   - brew upgrade python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
+  - echo $PATH
+  - python --version
+  - which -a python
   - pip --version
   - pip install 'requests[security]'
   - pip install -r requirements.txt
