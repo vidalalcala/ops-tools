@@ -12,6 +12,7 @@ install:
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
   - pip --version
+  - pip install 'requests[security]'
   - pip install -r requirements.txt
 
 before_script:
