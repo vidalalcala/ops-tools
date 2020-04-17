@@ -4,12 +4,10 @@ os:
 osx_image:
   - xcode9.2
 
-compiler:
-  - g++-5
-
 install:
-  - if [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
   - brew update
+  - brwe doctor
+  - brew cleanup
   - brew upgrade openssl
   - brew upgrade python
   - brew tap liamg/tfsec
