@@ -6,6 +6,7 @@ osx_image:
 
 install:
   - brew update
+  - brew install python@3.8 xz
   - brew doctor
   - brew cleanup
   - brew upgrade openssl
