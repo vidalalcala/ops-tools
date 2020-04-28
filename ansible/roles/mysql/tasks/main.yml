@@ -1,0 +1,111 @@
+- name: Install coreutils
+  homebrew:
+    name: coreutils
+    state: present
+
+- name: Install mysql
+  homebrew:
+    name: mysql
+    state: present
+
+- name: Install PyMySQL
+  pip:
+    name: PyMySQL
+
+- name: Copy my.cnf global MySQL configuration.
+  template:
+    src: ../templates/my.cnf.j2
+    dest: "{{ mysql_config_file }}"
+
+- name: Register mysql keg path
+  command: "greadlink -f {{ brew_prefix }}/bin/mysql"
+  register: brew_mysql_path_register
+
+- name: Set mysql keg path
+  set_fact:
+    brew_mysql_path: "{{ brew_mysql_path_register.stdout }}"
+
+- name: Set mysql plist path
+  set_fact:
+    brew_mysql_plist_path: "{{ brew_mysql_path | regex_replace('/bin/mysql', '') }}"
+
+- name: Copy brew mysql plist.
+  template:
+    src: ../templates/homebrew.mxcl.mysql.plist.j2
+    dest: "{{ brew_mysql_plist_path }}/homebrew.mxcl.mysql.plist"
+
+- name: Create basedir if it does not exist
+  file:
+    path: "{{ mysql_basedir }}"
+    state: directory
+    setype: mysqld_db_t
+
+- name: Create datadir if it does not exist
+  file:
+    path: "{{ mysql_datadir }}"
+    state: directory
+    setype: mysqld_db_t
+
+- name: Create lc_messages_dir if it does not exist
+  file:
+    path: "{{ mysql_lc_messages_dir }}"
+    state: directory
+    setype: mysqld_db_t
+
+- name: Check datadir status
+  find:
+    paths: "{{ mysql_datadir }}"
+  register: datadir_files
+
+- name: Run mysqld initialization when necessary
+  command: "mysqld --defaults-file={{ mysql_config_file }} --initialize-insecure"
+  when: not datadir_files.matched > 0
+
+- name: Start service with Homebrew
+  command: brew services start mysql
+
+- name: Ensure default user is present.
+  mysql_user:
+    name: "{{ mysql_admin_credentials.name }}"
+    password: "{{ mysql_admin_credentials.password }}"
+    priv: '*.*:ALL,GRANT'
+    state: present
+    login_user: root
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: "{{ mysql_socket }}"
+  when: mysql_admin_credentials.name != "root"
+  register: task_result
+  retries: 40
+  delay: 6
+  until: task_result is not failed
+  no_log: true
+
+- name: Disallow root login remotely
+  command: 'mysql -uroot -NBe "{{ item }}"'
+  with_items:
+    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  changed_when: false
+
+- name: Get list of hosts for the anonymous user.
+  command: mysql -uroot -NBe 'SELECT Host FROM mysql.user WHERE User = ""'
+  register: mysql_anonymous_hosts
+  changed_when: false
+  check_mode: false
+
+- name: Remove anonymous MySQL users.
+  mysql_user:
+    name: ""
+    host: "{{ item }}"
+    state: absent
+    login_user: root
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: "{{ mysql_socket }}"
+  with_items: "{{ mysql_anonymous_hosts.stdout_lines|default([]) }}"
+
+- name: Remove MySQL test database.
+  mysql_db:
+    name: test
+    state: absent
+    login_user: root
+    login_port: "{{ mysql_port }}"
+    login_unix_socket: "{{ mysql_socket }}"

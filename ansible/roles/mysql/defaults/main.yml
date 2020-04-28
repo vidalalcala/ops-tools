@@ -1,0 +1,13 @@
+mysql_port: 3307
+mysql_socket: /tmp/mysql.sock
+brew_prefix: /usr/local
+mysql_config_file: "{{ brew_prefix }}/etc/my.cnf"
+mysql_basedir: "{{ brew_prefix }}/var/mysql"
+mysql_datadir: "{{ brew_prefix }}/var/mysql/data"
+mysql_lc_messages_dir: "{{ brew_prefix }}/var/mysql/share"
+mysql_admin_credentials:
+  first_name: MySQL
+  last_name: Admin
+  email: example@example.com
+  name: mysqladmin
+  password: mysql123

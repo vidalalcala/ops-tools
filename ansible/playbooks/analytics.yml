@@ -1,4 +1,31 @@
-- name: install virtualenv
+- name: Setup analytics
   hosts: localhost
-  roles:
-    - virtualenv
+
+  vars:
+    metabase_options:
+      use_own_database: false
+
+  tasks:
+    - name: Provision virtualenv
+      include_role:
+        name: virtualenv
+    - name: Include metabase admin vars
+      include_vars:
+        file: ../secrets/metabase_admin.yml
+        name: metabase_admin
+      no_log: true
+    - name: Provision metabase
+      include_role:
+        name: metabase
+      vars:
+        metabase_admin_credentials: "{{ metabase_admin }}"
+    - name: Include vars of secrets/mysql_admin.yaml .
+      include_vars:
+        file: ../secrets/mysql_admin.yml
+        name: mysql_admin
+      no_log: true
+    - name: Provision mysql
+      include_role:
+        name: mysql
+      vars:
+        mysql_admin_credentials: "{{ mysql_admin }}"
