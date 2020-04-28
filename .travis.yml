@@ -11,7 +11,13 @@ install:
   - brew upgrade python
   - brew tap liamg/tfsec
   - brew install liamg/tfsec/tfsec
+  - brew install secrethub/tools/secrethub-cli
   - pip install -r requirements.txt
+
+env:
+  - ANSIBLE_VAULT_PASSWORD="secrethub://vidal/ops/ops-tools/vault_pass.txt"
 
 script:
   - tfsec .
+  - cd ansible
+  - secrethub run -- ansible-playbook playbooks/analytics.yml --vault-password-file=ansible_vault_password.py
