@@ -1,0 +1,26 @@
+- name: Download compressed urls
+  unarchive:
+    src: "{{ item }}"
+    dest: "{{ data_path }}"
+    remote_src: yes
+  with_items: "{{ compressed_data_urls }}"
+
+- name: Set database
+  mysql_db:
+    name: data
+    state: present
+    login_user: root
+    login_port: "{{ mysql_port }}"
+    login_host: "127.0.0.1"
+    login_unix_socket: "{{ mysql_socket }}"
+    config_file: "{{ mysql_config_file }}"
+
+- name: Get csvkit
+  pip:
+    name: csvkit
+    state: present
+
+- name: Load data in mysql
+  command: "csvsql --db mysql+pymysql://root@127.0.0.1:{{ mysql_port }}/data --insert {{ item }}" 
+  with_fileglob:
+    - "{{ data_path }}/*.csv"

@@ -1,0 +1,17 @@
+compressed_data_urls:
+  - http://187.191.75.115/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip
+
+data_path: /tmp/data
+
+brew_prefix: /usr/local
+mysql_config_file: "{{ brew_prefix }}/etc/my.cnf"
+
+mysql_port: 3307
+mysql_socket: /tmp/mysql.sock
+
+mysql_admin_credentials:
+  first_name: MySQL
+  last_name: Admin
+  email: example@example.com
+  name: mysqladmin
+  password: mysql123

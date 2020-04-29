@@ -4,16 +4,16 @@
   vars:
     metabase_options:
       use_own_database: false
+    analytics_mysql_port: 3307
+    analytics_mysql_socket: /tmp/mysql.sock
 
   tasks:
     - name: Register brew prefix
       command: brew --prefix
       register: brew_prefix_path_register
-
     - name: Set brew prefix path
       set_fact:
         brew_prefix_path: "{{ brew_prefix_path_register.stdout }}"
-
     - name: Provision virtualenv
       include_role:
         name: virtualenv
@@ -39,3 +39,12 @@
       vars:
         mysql_admin_credentials: "{{ mysql_admin }}"
         brew_prefix: "{{ brew_prefix_path }}"
+        mysql_port: "{{ analytics_mysql_port }}"
+        mysql_socket: "{{ analytics_mysql_socket }}"
+    - name: Provision data in mysql
+      include_role:
+        name: data
+      vars:
+        mysql_admin_credentials: "{{ mysql_admin }}"
+        mysql_port: "{{ analytics_mysql_port }}"
+        mysql_socket: "{{ analytics_mysql_socket }}"
