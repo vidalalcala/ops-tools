@@ -25,16 +25,16 @@
 
 - name: Set metabase session
   uri:
-    url: "http://localhost:{{ metabase_port }}/api/session/properties"
+    url: "http://127.0.0.1:{{ metabase_port }}/api/session/properties"
     status_code: 200
   register: metabase_api_session
   until: metabase_api_session is not failed
-  retries: 20
+  retries: 40
   delay: 6
 
 - name: Submit initial configuration
   uri:
-    url: "http://localhost:{{ metabase_port }}/api/setup"
+    url: "http://127.0.0.1:{{ metabase_port }}/api/setup"
     method: POST
     body:
       token: "{{ metabase_api_session.json['setup-token'] }}"
