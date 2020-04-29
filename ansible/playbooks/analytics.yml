@@ -6,6 +6,14 @@
       use_own_database: false
 
   tasks:
+    - name: Register brew prefix
+      command: brew --prefix
+      register: brew_prefix_path_register
+
+    - name: Set brew prefix path
+      set_fact:
+        brew_prefix_path: "{{ brew_prefix_path_register.stdout }}"
+
     - name: Provision virtualenv
       include_role:
         name: virtualenv
@@ -19,6 +27,7 @@
         name: metabase
       vars:
         metabase_admin_credentials: "{{ metabase_admin }}"
+        brew_prefix: "{{ brew_prefix_path }}"
     - name: Include vars of secrets/mysql_admin.yaml .
       include_vars:
         file: ../secrets/mysql_admin.yml
@@ -29,3 +38,4 @@
         name: mysql
       vars:
         mysql_admin_credentials: "{{ mysql_admin }}"
+        brew_prefix: "{{ brew_prefix_path }}"
