@@ -1,13 +1,28 @@
 compressed_data_urls:
   - http://187.191.75.115/gobmx/salud/datos_abiertos/datos_abiertos_covid19.zip
 
+data_files:
+  - file_name: data_prueba_tecnica.csv
+    table_name: data_prueba_tecnica
+    create_table_sql: "'CREATE TABLE IF NOT EXISTS `data_prueba_tecnica` (
+  `id` varchar(40) NOT NULL,
+  `name` varchar(130) NULL,
+  `company_id` varchar(130) NOT NULL,
+  `amount` decimal(16,2) NOT NULL,
+  `status` varchar(30) NOT NULL,
+  `created_at` timestamp NOT NULL,
+  `paid_at` timestamp NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;'"
+
 data_path: /tmp/data
 
 brew_prefix: /usr/local
-mysql_config_file: "{{ brew_prefix }}/etc/my.cnf"
 
+mysql_config_file: "{{ brew_prefix }}/etc/my.cnf"
 mysql_port: 3307
 mysql_socket: /tmp/mysql.sock
+mysql_database: default
 
 mysql_admin_credentials:
   first_name: MySQL
@@ -15,3 +30,4 @@ mysql_admin_credentials:
   email: example@example.com
   name: mysqladmin
   password: mysql123
+  root_password: mysql123

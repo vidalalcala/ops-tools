@@ -2,32 +2,18 @@
   hosts: localhost
 
   vars:
-    metabase_options:
-      use_own_database: false
     analytics_mysql_port: 3307
-    analytics_mysql_socket: /tmp/mysql.sock
+    analytics_database: data
 
   tasks:
-    - name: Register brew prefix
-      command: brew --prefix
-      register: brew_prefix_path_register
-    - name: Set brew prefix path
+    - name: register docker-machine ip
+      command: docker-machine ip
+      register: docker_machine_ip_register
+      changed_when:
+        - docker_machine_ip_register.rc == 0
+    - name: Set docker-machine ip
       set_fact:
-        brew_prefix_path: "{{ brew_prefix_path_register.stdout }}"
-    - name: Provision virtualenv
-      include_role:
-        name: virtualenv
-    - name: Include metabase admin vars
-      include_vars:
-        file: ../secrets/metabase_admin.yml
-        name: metabase_admin
-      no_log: true
-    - name: Provision metabase
-      include_role:
-        name: metabase
-      vars:
-        metabase_admin_credentials: "{{ metabase_admin }}"
-        brew_prefix: "{{ brew_prefix_path }}"
+        analytics_docker_machine_ip: "{{ docker_machine_ip_register.stdout }}"
     - name: Include vars of secrets/mysql_admin.yaml .
       include_vars:
         file: ../secrets/mysql_admin.yml
@@ -40,11 +26,13 @@
         mysql_admin_credentials: "{{ mysql_admin }}"
         brew_prefix: "{{ brew_prefix_path }}"
         mysql_port: "{{ analytics_mysql_port }}"
-        mysql_socket: "{{ analytics_mysql_socket }}"
+        mysql_database: "{{ analytics_database }}"
+        docker_machine_ip: "{{ analytics_docker_machine_ip }}"
     - name: Provision data in mysql
       include_role:
         name: data
       vars:
         mysql_admin_credentials: "{{ mysql_admin }}"
         mysql_port: "{{ analytics_mysql_port }}"
-        mysql_socket: "{{ analytics_mysql_socket }}"
+        mysql_host: "{{ analytics_docker_machine_ip }}"
+        mysql_database: "{{ analytics_database }}"

@@ -1,26 +1,86 @@
-- name: Download compressed urls
-  unarchive:
-    src: "{{ item }}"
-    dest: "{{ data_path }}"
-    remote_src: yes
-  with_items: "{{ compressed_data_urls }}"
+
+- name: Create data_path if it does not exist
+  file:
+    path: "{{ data_path }}"
+    state: directory
 
 - name: Set database
   mysql_db:
     name: data
     state: present
-    login_user: root
+    login_user: "{{ mysql_admin_credentials.name }}"
     login_port: "{{ mysql_port }}"
-    login_host: "127.0.0.1"
-    login_unix_socket: "{{ mysql_socket }}"
+    login_host: "{{ mysql_host }}"
+    login_password: "{{ mysql_admin_credentials.password }}"
     config_file: "{{ mysql_config_file }}"
+  no_log: true
+
+- name: Remove carriage return characters
+  replace:
+    path: "{{ item }}"
+    regexp: '\r'
+  with_fileglob:
+    - "{{ data_path }}/*.csv"
 
 - name: Get csvkit
   pip:
     name: csvkit
     state: present
 
+- name: Register tables in data database
+  command: >-
+    mysql -u{{ mysql_admin_credentials.name }}
+     -p{{ mysql_admin_credentials.password }}
+     -h{{ mysql_host }}
+     -P{{ mysql_port }}
+     --skip-column-names
+     -e'SHOW TABLES IN {{ mysql_database }};'
+  register: show_tables_register
+  changed_when:
+    - show_tables_register.rc == 0
+  no_log: true
+
+- name: Create tables in data database
+  command: >-
+    mysql
+    -u{{ mysql_admin_credentials.name }}
+    -D{{ mysql_database }}
+    -p{{ mysql_admin_credentials.password }}
+    -h{{ mysql_host }}
+    -P{{ mysql_port }}
+    --skip-column-names
+    -e{{ item.create_table_sql }}
+  when: item.table_name not in show_tables_register.stdout
+  loop: "{{ data_files }}"
+  no_log: true
+
+- name: Register tables sizes
+  command: >-
+    mysql
+    -u{{ mysql_admin_credentials.name }}
+    -p{{ mysql_admin_credentials.password }}
+    -h{{ mysql_host }}
+    -P{{ mysql_port }}
+    --skip-column-names
+    -e'SELECT COUNT(*) FROM {{ mysql_database }}.{{ item.table_name }};'
+  register: size_tables_register
+  when: item.table_name in show_tables_register.stdout
+  loop: "{{ data_files }}"
+  no_log: true
+
 - name: Load data in mysql
-  command: "csvsql --db mysql+pymysql://root@127.0.0.1:{{ mysql_port }}/data --insert {{ item }}" 
-  with_fileglob:
-    - "{{ data_path }}/*.csv"
+  command: >-
+    mysql
+    -D{{ mysql_database }}
+    -u{{ mysql_admin_credentials.name }}
+    -p{{ mysql_admin_credentials.password }}
+    -h{{ mysql_host }}
+    -P{{ mysql_port }}
+    --skip-column-names
+    -e"LOAD DATA LOCAL INFILE '{{ data_path }}/{{ item[0].file_name }}'
+    INTO TABLE {{ item[0].table_name }};"
+  when: item[1].stdout[0] == '0'
+  with_together:
+    - "{{ data_files }}"
+    - "{{ size_tables_register.results }}"
+  no_log: true

@@ -11,3 +11,7 @@ mysql_admin_credentials:
   email: example@example.com
   name: mysqladmin
   password: mysql123
+  root_password: mysql123
+mysql_database: default
+
+docker_machine_ip: 127.0.0.1

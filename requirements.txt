@@ -1,1 +1,4 @@
 ansible
+docker
+docker-compose
+ansible-lint

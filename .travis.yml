@@ -20,6 +20,7 @@ install:
 
 script:
   - tfsec .
+  - ansible-lint
 # TODO: Add ansible playbook provisioning
 #  - cd ansible
 #  - secrethub run -- ansible-playbook playbooks/analytics.yml --vault-password-file=ansible_vault_password.py
