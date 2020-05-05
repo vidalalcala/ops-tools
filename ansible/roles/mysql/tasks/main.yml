@@ -1,22 +1,27 @@
+- name: Create a docker volume for mysql data
+  docker_volume:
+    name: "{{ mysql_docker_volume }}"
+
 - name: Start MySQL service
-  docker_compose:
-    project_name: mysql
-    definition:
-      version: '3.3'
-      services:
-        mysql_db:
-          image: mysql:5.7
-          restart: always
-          environment:
-            MYSQL_ROOT_PASSWORD: "{{ mysql_admin_credentials.root_password }}"
-          ports:
-            - "{{ mysql_port }}:3306"
-          expose:
-            - 3306
-          volumes:
-            - mysql_data:/var/lib/mysql
-      volumes:
-        mysql_data:
+  docker_container:
+    name: mysql_db
+    image: mysql/mysql-server:8.0
+    command: ["--log-bin={{ mysql_container_path }}/mysql-bin.log",
+              "--log-bin-index={{ mysql_container_path }}/bin-log.index",
+              "--max_binlog_size=100M",
+              "--binlog_format=row",
+              "--local_infile=1"]
+    state: started
+    env:
+      MYSQL_ROOT_PASSWORD: "{{ mysql_admin_credentials.root_password }}"
+      MYSQL_ROOT_HOST: "%"
+    ports:
+      - "{{ mysql_port }}:3306"
+    exposed_ports:
+      - "3306"
+    mounts:
+      - source: "{{ mysql_docker_volume }}"
+        target: "{{ mysql_container_path }}"
   register: mysql_docker_register
   no_log: true
 

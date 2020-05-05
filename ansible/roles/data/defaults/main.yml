@@ -17,11 +17,8 @@ data_files:
 
 data_path: /tmp/data
 
-brew_prefix: /usr/local
-
-mysql_config_file: "{{ brew_prefix }}/etc/my.cnf"
 mysql_port: 3307
-mysql_socket: /tmp/mysql.sock
+
 mysql_database: default
 
 mysql_admin_credentials:

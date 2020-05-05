@@ -12,7 +12,6 @@
     login_port: "{{ mysql_port }}"
     login_host: "{{ mysql_host }}"
     login_password: "{{ mysql_admin_credentials.password }}"
-    config_file: "{{ mysql_config_file }}"
   no_log: true
 
 - name: Remove carriage return characters
@@ -54,6 +53,19 @@
   loop: "{{ data_files }}"
   no_log: true
 
+- name: Register tables in data database
+  command: >-
+    mysql -u{{ mysql_admin_credentials.name }}
+     -p{{ mysql_admin_credentials.password }}
+     -h{{ mysql_host }}
+     -P{{ mysql_port }}
+     --skip-column-names
+     -e'SHOW TABLES IN {{ mysql_database }};'
+  register: show_tables_register
+  changed_when:
+    - show_tables_register.rc == 0
+  no_log: true
+
 - name: Register tables sizes
   command: >-
     mysql
@@ -77,6 +89,7 @@
     -h{{ mysql_host }}
     -P{{ mysql_port }}
     --skip-column-names
+    --local-infile=1
     -e"LOAD DATA LOCAL INFILE '{{ data_path }}/{{ item[0].file_name }}'
     INTO TABLE {{ item[0].table_name }};"
   when: item[1].stdout[0] == '0'

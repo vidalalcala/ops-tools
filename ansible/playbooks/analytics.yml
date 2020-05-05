@@ -6,6 +6,14 @@
     analytics_database: data
 
   tasks:
+    - name: Register brew prefix
+      command: brew --prefix
+      register: brew_prefix_path_register
+      changed_when:
+        - brew_prefix_path_register.rc == 0
+    - name: Set brew prefix path
+      set_fact:
+        brew_prefix_path: "{{ brew_prefix_path_register.stdout }}"
     - name: register docker-machine ip
       command: docker-machine ip
       register: docker_machine_ip_register
