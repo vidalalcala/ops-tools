@@ -21,11 +21,6 @@
   with_fileglob:
     - "{{ data_path }}/*.csv"
 
-- name: Get csvkit
-  pip:
-    name: csvkit
-    state: present
-
 - name: Register tables in data database
   command: >-
     mysql -u{{ mysql_admin_credentials.name }}

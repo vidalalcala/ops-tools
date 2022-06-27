@@ -35,7 +35,7 @@
     login_user: root
     login_password: "{{ mysql_admin_credentials.root_password }}"
     login_port: "{{ mysql_port }}"
-    login_host: "{{ docker_machine_ip }}"
+    login_host: "{{ minikube_ip }}"
   when: mysql_admin_credentials.name != "root"
   register: task_result
   retries: 40

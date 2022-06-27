@@ -1,5 +1,4 @@
 mysql_port: 3307
-mysql_basedir: "{{ brew_prefix }}/var/mysql"
 mysql_admin_credentials:
   first_name: MySQL
   last_name: Admin
@@ -9,6 +8,6 @@ mysql_admin_credentials:
   root_password: mysql123
 mysql_database: default
 
-docker_machine_ip: 127.0.0.1
+minikube_ip: 127.0.0.1
 mysql_docker_volume: mysql_data
 mysql_container_path: /var/lib/mysql
